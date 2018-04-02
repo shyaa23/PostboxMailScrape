@@ -2,8 +2,12 @@ from lxml import html
 import requests
 import warnings
 import pprint
+import datetime
+import json
 
 warnings.filterwarnings("ignore")
+
+time = datetime.datetime.now()
 
 USERNAME = "1491"
 PASSWORD = "469169"
@@ -47,11 +51,17 @@ for elem in table:
         tbody_td = [word.strip() for word in tbody_td]
 
         if tbody_td == []:
-            print("EMPTY POSTBOX.....NO MAIL LIST")
-            print('\n')
-            d = dict(map(lambda e: (e, ' '), thead_th))
-            pprint.pprint(d)
+            print("Empty Postbox........No Mail List")
+            data = dict(map(lambda e: (e, ' '), thead_th))
+            data['Mail Checked At'] = str(time)
+            pprint.pprint(data)
+            print("\n")
+            with open('/home/shreya/Documents/PostboxData.json', 'w') as f:
+                json.dump(data, f, sort_keys=True, indent=2)
 
         else:
-            d = dict(zip(thead_th, tbody_td))
-            pprint.pprint(d)
+            data = dict(zip(thead_th, tbody_td))
+            data['Mail Checked At'] = str(time)
+            pprint.pprint(data)
+            with open('/home/shreya/Documents/PostboxData.json', 'w') as f:
+                json.dump(data, f, sort_keys=True, indent=2)
