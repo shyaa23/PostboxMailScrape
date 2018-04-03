@@ -3,7 +3,31 @@ import requests
 import warnings
 import pprint
 import datetime
-import json
+
+#Send Email Notification:
+def notify(sender, password, reciever):
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = reciever
+    msg['Subject'] = 'Check Mail Notification'
+    message = 'Check Your Postbox.'
+    msg.attach(MIMEText(message))
+
+    mailserver = smtplib.SMTP('smtp.gmail.com',587)
+    # identify ourselves to smtp gmail client
+    mailserver.ehlo()
+    # secure our email with tls encryption
+    mailserver.starttls()
+    # re-identify ourselves as an encrypted connection
+    mailserver.ehlo()
+    mailserver.login(sender, password)
+    mailserver.sendmail(sender,reciever,msg.as_string())
+    mailserver.quit()
+
 
 warnings.filterwarnings("ignore")
 
@@ -20,7 +44,6 @@ session_requests = requests.session()
 response = session_requests.get(login_url,verify=False)
 tree = html.fromstring(response.text)
 csrf_token = tree.xpath("//input[@name='__RequestVerificationToken']/@value")
-#print(csrf_token)
 
 # Create payload
 payload = {
@@ -45,10 +68,12 @@ for elem in table:
         thead_th = title.xpath('//*[@id="body"]/div[2]/div/section/div[2]/div/table/thead/tr/th/text()')
         thead_th = [word.strip() for word in thead_th]
         rows =title.xpath("//*[@id='body']/div[2]/div/section/div[2]/div/table/tbody/tr")
-        #for i,item in enumerate(rows):
-        #tbody_td = item.xpath('//*[@id="body"]/div[2]/div/section/div[2]/div/table/tbody/tr'+str([i+1])+'/td/text()')
-        tbody_td = value.xpath('//*[@id="body"]/div[2]/div/section/div[2]/div/table/tbody/tr/td/text()')
-        tbody_td = [word.strip() for word in tbody_td]
+        if rows:
+            for i,item in enumerate(rows):
+                tbody_td = item.xpath('//*[@id="body"]/div[2]/div/section/div[2]/div/table/tbody/tr'+str([i+1])+'/td/text()')
+        else:
+            tbody_td = value.xpath('//*[@id="body"]/div[2]/div/section/div[2]/div/table/tbody/tr/td/text()')
+            tbody_td = [word.strip() for word in tbody_td]
 
         if tbody_td == []:
             print("Empty Postbox........No Mail List")
@@ -56,12 +81,11 @@ for elem in table:
             data['Mail Checked At'] = str(time)
             pprint.pprint(data)
             print("\n")
-            with open('/home/shreya/Documents/PostboxData.json', 'w') as f:
-                json.dump(data, f, sort_keys=True, indent=2)
+            notify('sender@gmail.com', 'senderpassword', 'reciever@gmail.com')
 
         else:
             data = dict(zip(thead_th, tbody_td))
             data['Mail Checked At'] = str(time)
             pprint.pprint(data)
-            with open('/home/shreya/Documents/PostboxData.json', 'w') as f:
-                json.dump(data, f, sort_keys=True, indent=2)
+            notify('sender@gmail.com', 'senderpassword', 'reciever@gmail.com')
+
