@@ -95,5 +95,5 @@ def job_function():
                 data['Mail Checked At'] = str(time)
                 pprint.pprint(data)
                 notify('sender@gmail.com', 'senderpassword', 'reciever@gmail.com')
-# Schedules job_function to be run once each minute
+# Schedules job_function to be run everyday at 7
 sched.add_cron_job(job_function, hour='7', minute='0')
