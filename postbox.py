@@ -33,8 +33,8 @@ warnings.filterwarnings("ignore")
 
 time = datetime.datetime.now()
 
-USERNAME = "1491"
-PASSWORD = "469169"
+USERNAME = "****"
+PASSWORD = "*******"
 
 login_url = 'https://onlinepostbox.gpo.gov.np/'
 url = "https://onlinepostbox.gpo.gov.np/PBOnlineMail/ListOnlineMail"
